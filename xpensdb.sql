@@ -22,6 +22,49 @@ create database if not exists $$DATABASE_NAME$$ character set utf8 collate utf8_
 -- Employ $$DATABASE_NAME$$
 use $$DATABASE_NAME$$;                                                                            -- $$ DATABASE_NAME $$
 
+-- drop table if exists appLogs;
+
+-- 1. T1. appLogs table to store application logs
+create table if not exists appLogs (
+    id                                        int ( 10 ) unsigned              not null auto_increment,
+    log                                       varchar( 255 )                   not null,
+    created                                   datetime                         not null,
+    key ( id )
+) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
+
+drop procedure if exists addAppLog;
+
+delimiter //
+
+create procedure addAppLog(
+    in            p_log                       varchar( 255 )
+)
+begin
+
+    insert appLogs (log, created)
+    values ( p_log, utc_timestamp() );
+
+end //
+
+delimiter ;
+
+drop procedure showLatestAppLogs;
+
+delimiter //
+
+create procedure showLatestAppLogs(
+    in            p_count                     int ( 10 ) unsigned
+)
+begin
+    select id, log, created
+    from appLogs
+    order by id desc
+    limit p_count;
+
+end //
+
+delimiter ;
+
 -- drop table if exists systemSettings;
 
 -- 1. T1. systemSettings table to store system settings
