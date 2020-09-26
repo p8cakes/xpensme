@@ -10,14 +10,16 @@
 //
 // Output JSON:
 //   {"errorCode":0,
-//    "logs":[
-//      { "logId":8
+//    "rows":[
+//      { "id":8
 //        "log":"Foo Bar",
 //        "created":"2020-09-25 21:30:45"
-//      },{"logId":7
+//      },{
+//        "id":7
 //        "log":"Foo Bai Foo",
 //        "created":"2020-09-25 21:30:41"
-//      }],
+//      }
+//    ],
 //    "query":"SQL query run"}
 //
 // Output JSON:
