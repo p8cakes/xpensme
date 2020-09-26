@@ -83,8 +83,8 @@ $checkResponse = json_decode(utf8_decode($response), true);
 $errorCode     = intval($checkResponse["errorCode"]);
 
 if ($errorCode === 0) {
-    $value = $checkResponse["logId"];
-    echo("value is $logId");
+    $logId = $checkResponse["logId"];
+    echo("logId is $logId");
 } else {
     echo($checkResponse);
 }
