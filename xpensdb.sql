@@ -41,8 +41,13 @@ create procedure addAppLog(
 )
 begin
 
+    declare l_logId                           int ( 10 ) unsigned default 0;
+
     insert appLogs (log, created)
     values ( p_log, utc_timestamp() );
+
+    select last_insert_id() into l_logId;
+    select l_logId as logId;
 
 end //
 
