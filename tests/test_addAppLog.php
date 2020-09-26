@@ -40,7 +40,7 @@ ob_start();
 session_start();
 
 // Break out of test if key not present in incoming request
-if ((!isset($_GET["s"])) || ($_GET["s"] !== "")) {     // $$ TEST_QUERY_KEY $$
+if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
     exit();
 }   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
 
