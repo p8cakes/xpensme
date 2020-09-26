@@ -10,9 +10,9 @@
 -- 2.    P1. addAppLog stored procedure to add a certain string or log to the appLogs table
 -- 3.    P2. showLatestAppLogs stored procedure to fetch the latest configurable amount of logs inserted
 -- 4.    P3. clearAppLogs stored procedure to remove all entries from appLogs table
--- 5.    T2.    systemSettings table - table to store system settings, queried at session start and other places.
--- 6.    P4:    populateSystemSettings SP - to get initial set of settings required for app.
--- 7.    P5:    getSystemSetting SP - to get the value for a provided setting name.
+-- 5.    T2. systemSettings table - table to store system settings, queried at session start and other places.
+-- 6.    P4: populateSystemSettings SP - to get initial set of settings required for app.
+-- 7.    P5: getSystemSetting SP - to get the value for a provided setting name.
 --
 -- Revisions:
 --      1. Sundar Krishnamurthy         sundar@passion8cakes.com               9/25/2020       Initial file created.
