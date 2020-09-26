@@ -36,7 +36,7 @@
 //    None
 //
 // Revisions:
-//    1. Sundar Krishnamurthy          sundar_k@hotmail.com       10/25/2020      Initial file created.
+//    1. Sundar Krishnamurthy          sundar@passion8cakes.com       10/25/2020      Initial file created.
 
 ini_set('session.cookie_httponly', TRUE);           // Mitigate XSS
 ini_set('session.session.use_only_cookies', TRUE);  // No session fixation
