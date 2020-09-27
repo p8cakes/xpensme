@@ -86,7 +86,7 @@ if ($errorCode === 0) {
     $logId = $checkResponse["logId"];
     echo("logId is $logId");
 } else {
-    echo("ErrorCode: " . $errorCode);
+    echo("ErrorCode: " . $errorCode . "<br>");
     echo("Error: " . $checkResponse["error"]);
 }
 ob_end_flush();
