@@ -9,6 +9,7 @@
 //
 // Query Parameters:
 //    s: Magic key that should be present in query-string for this test to succeed
+//    m: Message that you want to log to appLogs table
 //
 // Custom Headers:
 //    None
@@ -39,10 +40,16 @@ ob_start();
 // Start the initial session
 session_start();
 
+$message = "Foo Bar";
+
 // Break out of test if key not present in incoming request
 if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
     exit();
 }   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
+
+if (isset($_GET["m"])) {
+    $message = $_GET["m"];
+}   //  End if ((isset($_GET["m"]))
 
 // First off, check if the application is being used by someone not typing the actual server name in the header
 if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
@@ -56,7 +63,7 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
 $ch               = curl_init();
 
 $elements         = array();
-$elements["log"]  = "Foo Bar";
+$elements["log"]  = $message;
 $elements["dump"] = true;
 
 curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/addAppLog.php");
@@ -88,6 +95,6 @@ if ($errorCode === 0) {
 } else {
     echo("ErrorCode: " . $errorCode . "<br>");
     echo("Error: " . $checkResponse["error"]);
-}
+}   //  End if ($errorCode === 0)  
 ob_end_flush();
 ?>
