@@ -65,7 +65,7 @@ if (isset($_GET["c"])) {
 
 // STEP 1 - Positive use-case
 // ********* Call Web Service with number of rows required, see how many you get back (latest logs) ********** //
-$ch               = curl_init();
+$ch                = curl_init();
 
 $elements          = array();
 $elements["count"] = $count;
