@@ -41,6 +41,13 @@ session_start();
 
 $count = 3;      // Default value - fetch 3 records
 
+// First off, check if the application is being used by someone not typing the actual server name in the header
+if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
+    // Transfer user to same page, served over HTTPS and full-domain name
+    header("Location: https://" . $global_siteCookieQualifier . $_SERVER["REQUEST_URI"]);
+    exit();
+}   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
+
 // Break out of test if key not present in incoming request
 if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
     exit();
@@ -55,13 +62,6 @@ if (isset($_GET["c"])) {
         $count = 50;
     }   //  End if ($count > 50)
 }   //  End if (isset($_GET["c"]))
-
-// First off, check if the application is being used by someone not typing the actual server name in the header
-if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
-    // Transfer user to same page, served over HTTPS and full-domain name
-    header("Location: https://" . $global_siteCookieQualifier . $_SERVER["REQUEST_URI"]);
-    exit();
-}   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
 
 // STEP 1 - Positive use-case
 // ********* Call Web Service with number of rows required, see how many you get back (latest logs) ********** //
@@ -104,6 +104,7 @@ if ($errorCode === 0) {
         echo("<table border='1'><tbody><th>ID</th><th>log</th><th>Created</th></tr>");
 
         foreach ($rows as &$row) {
+
             echo("<tr><td>");
             echo($row["id"]);
             echo("</td><td>");
@@ -115,10 +116,11 @@ if ($errorCode === 0) {
 
         echo("</tbody></table>");
     }   //  End if ($rows == null)
+
 } else {
     echo("ErrorCode: " . $errorCode . "<br>");
     echo("Error: " . $checkResponse["error"]);
-}
+}   //  End if ($errorCode === 0)
 
 ob_end_flush();
 ?>
