@@ -39,10 +39,22 @@ ob_start();
 // Start the initial session
 session_start();
 
+$count = 3;      // Default value - fetch 3 records
+
 // Break out of test if key not present in incoming request
 if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
     exit();
 }   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
+
+// See if count has been specified - c parameter
+if (isset($_GET["c"])) {
+    $count = intval($_GET["c"]);
+
+    // Limit number of retrieved records to 50
+    if ($count > 50) {
+        $count = 50;
+    }   //  End if ($count > 50)
+}   //  End if (isset($_GET["c"]))
 
 // First off, check if the application is being used by someone not typing the actual server name in the header
 if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
@@ -56,7 +68,7 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
 $ch               = curl_init();
 
 $elements          = array();
-$elements["count"] = 3;
+$elements["count"] = $count;
 $elements["dump"]  = true;
 
 curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/addAppLog.php");
@@ -85,21 +97,28 @@ $checkResponse = json_decode(utf8_decode($response), true);
 $errorCode     = intval($checkResponse["errorCode"]);
 
 if ($errorCode === 0) {
-    echo("<table border='1'><tbody><th>ID</th><th>log</th><th>Created</th></tr>");
     $rows = $checkResponse["rows"];
 
-    foreach ($rows as &$row) {
-        echo("<tr><td>");
-        echo($row["id"]);
-        echo("</td><td>");
-        echo($row["log"]);
-        echo("</td><td>");
-        echo($row["created"]);
-        echo("</td></tr>");                        
-    }   //  End foreach ($rows as &$row)
+    if (sizeof($rows) == 0) {
+        echo("No logs found");
+    } else {
 
-    echo("</tbody></table>");
+        echo("<table border='1'><tbody><th>ID</th><th>log</th><th>Created</th></tr>");
+
+        foreach ($rows as &$row) {
+            echo("<tr><td>");
+            echo($row["id"]);
+            echo("</td><td>");
+            echo($row["log"]);
+            echo("</td><td>");
+            echo($row["created"]);
+            echo("</td></tr>");                        
+        }   //  End foreach ($rows as &$row)
+
+        echo("</tbody></table>");
+    }   //  End if (sizeof($rows) == 0)
 } else {
+    echo("ErrorCode: " . $errorCode . "<br>");
     echo("Error: " . $checkResponse["error"]);
 }
 
