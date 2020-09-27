@@ -131,7 +131,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                         $useLog = substr($useLog, 0, 255);
                     }   //  End if (strlen($useName) > 255)
 
-                    // This is the query we will run to get setting for specified name
+                    // This is the query we will run to add an entry to the appLogs table
                     $query  = "call addAppLog('$useLog');";
 
                     // Result of query
