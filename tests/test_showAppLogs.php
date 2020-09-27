@@ -64,7 +64,7 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
 }   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
 
 // STEP 1 - Positive use-case
-// ********* Call Web Service with valid log string, verify you get back a non-zero log ID ********** //
+// ********* Call Web Service with number of rows required, see how many you get back (latest logs) ********** //
 $ch               = curl_init();
 
 $elements          = array();
