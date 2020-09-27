@@ -39,17 +39,17 @@ ob_start();
 // Start the initial session
 session_start();
 
-// Break out of test if key not present in incoming request
-if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
-    exit();
-}   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
-
 // First off, check if the application is being used by someone not typing the actual server name in the header
 if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
     // Transfer user to same page, served over HTTPS and full-domain name
     header("Location: https://" . $global_siteCookieQualifier . $_SERVER["REQUEST_URI"]);
     exit();
 }   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
+
+// Break out of test if key not present in incoming request
+if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
+    exit();
+}   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
 
 // STEP 1 - Positive use-case
 // ********* Call Web Service to clear all rows in appLogs table *******************
