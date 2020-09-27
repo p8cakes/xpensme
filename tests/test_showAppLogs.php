@@ -71,7 +71,7 @@ $elements          = array();
 $elements["count"] = $count;
 $elements["dump"]  = true;
 
-curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/addAppLog.php");
+curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/showAppLogs.php");
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
     'ApiKey: $$API_KEY$$',           // $$ API_KEY $$
@@ -114,7 +114,7 @@ if ($errorCode === 0) {
         }   //  End foreach ($rows as &$row)
 
         echo("</tbody></table>");
-    }   //  End if (sizeof($rows) == 0)
+    }   //  End if ($rows == null)
 } else {
     echo("ErrorCode: " . $errorCode . "<br>");
     echo("Error: " . $checkResponse["error"]);
