@@ -99,7 +99,7 @@ $errorCode     = intval($checkResponse["errorCode"]);
 if ($errorCode === 0) {
     $rows = $checkResponse["rows"];
 
-    if (sizeof($rows) == 0) {
+    if ($rows == null) {
         echo("No logs found");
     } else {
 
