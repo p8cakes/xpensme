@@ -91,8 +91,6 @@ $response = curl_exec($ch);
 
 curl_close($ch);
 
-echo($response);
-
 $checkResponse = json_decode(utf8_decode($response), true);
 $errorCode     = intval($checkResponse["errorCode"]);
 
