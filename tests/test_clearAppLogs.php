@@ -86,7 +86,7 @@ if ($errorCode === 0) {
 } else {
     echo("ErrorCode: " . $errorCode . "<br>");
     echo("Error: " . $checkResponse["error"]);
-}
+}   //  End if ($errorCode === 0)
 
 ob_end_flush();
 ?>
