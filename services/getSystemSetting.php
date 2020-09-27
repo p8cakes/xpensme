@@ -37,7 +37,7 @@
 //    None
 //
 // Revisions:
-//    1. Sundar Krishnamurthy          sundar@passion8cakes.com       09/26/2020      Initial file created.
+//    1. Sundar Krishnamurthy          sundar_k@hotmail.com       10/24/2020      Initial file created.
 
 ini_set('session.cookie_httponly', TRUE);           // Mitigate XSS
 ini_set('session.session.use_only_cookies', TRUE);  // No session fixation
@@ -74,6 +74,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
     // We found a valid body to process
     if ($postBody !== "") {
 
+        $rowFound     = false;
         $bitmask      = 0;
         $dump         = false;
         $query        = null;
@@ -148,6 +149,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
                         if (array_key_exists("name", $row)) {
 
+                            $rowFound                = true;
                             $responseJson["name"]    = $row["name"];
                             $responseJson["value"]   = $row["value"];
                             $responseJson["enabled"] = intval($row["enabled"]);
@@ -171,6 +173,8 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
         // Some error occured
         if ($errorMessage !== null) {
             $responseJson["error"] = $errorMessage;
+        } elseif ($rowFound == false) {
+            $responseJson["value"] = "[NOT FOUND]";
         }   //  End if ($errorMessage !== null)
 
         if (($dump === true) && ($query !== null)) {
