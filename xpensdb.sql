@@ -445,13 +445,6 @@ begin
 
     if l_apiKeysCount = 0 then
 
-    apiId                                     int(10) unsigned                 not null auto_increment,
-    apiKey                                    varchar (32)                     not null,
-    email                                     varchar (128)                    not null,
-    active                                    tinyint(1) unsigned              not null default 0,
-    created                                   datetime                         not null,
-    lastUpdate                                datetime                         not null,
-
         insert mailApiKeys ( apiKey, email, active, created, lastUpdate)
         values ('$$MAIL_API_KEY$$',                                             // $$ MAIL_API_KEY $$
                 '$$ADMIN_EMAIL$$',                                              // $$ ADMIN_EMAIL $$
@@ -470,8 +463,8 @@ drop procedure populateApiKeys();
 
 -- 14. T5. appLogs table to store application logs.
 create table if not exists appLogs (
-    id                                        int( 10 ) unsigned              not null auto_increment,
-    log                                       varchar ( 255 )                   not null,
+    id                                        int( 10 ) unsigned               not null auto_increment,
+    log                                       varchar ( 255 )                  not null,
     created                                   datetime                         not null,
     key ( id )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
