@@ -18,19 +18,20 @@
 -- 10.    P6. getEmailToSend stored procedure to get the next email record that needs to be sent.
 -- 11.    P7. getAttachmentsForEmail stored procedure to get the next email record that needs to be sent.
 -- 12.    P8. deleteEmail stored procedure to delete the email whose ID is provided.
--- 13.    T5. appLogs table to store application logs.
--- 14.    P9. addAppLog stored procedure to add a certain string or log to the appLogs table.
--- 15.   P10. showLatestAppLogs stored procedure to fetch the latest configurable amount of logs inserted.
--- 16.   P11. clearAppLogs stored procedure to remove all entries from appLogs table.
--- 17.    T6. systemSettings table - table to store system settings, queried at session start and other places.
--- 18.   P12: populateSystemSettings SP - to get initial set of settings required for app.
--- 19.   P13: getSystemSetting SP - to get the value for a provided setting name.
+-- 13.    P9. populateApiKeys stored procedure to insert API keys into mailApiKeys table.
+-- 14.    T5. appLogs table to store application logs.
+-- 15.   P10. addAppLog stored procedure to add a certain string or log to the appLogs table.
+-- 16.   P11. showLatestAppLogs stored procedure to fetch the latest configurable amount of logs inserted.
+-- 17.   P12. clearAppLogs stored procedure to remove all entries from appLogs table.
+-- 18.    T6. systemSettings table - table to store system settings, queried at session start and other places.
+-- 19.   P13: populateSystemSettings SP - to get initial set of settings required for app.
+-- 20.   P14: getSystemSetting SP - to get the value for a provided setting name.
 --
 -- Revisions:
 --      1. Sundar Krishnamurthy         sundar@passion8cakes.com               9/25/2020       Initial file created.
 
 -- Very, very, very bad things happen if you uncomment this line below. Do at your peril, you have been warned!
--- drop database if exists $$DATABASE_NAME$$;                                                        -- $$ DATABASE_NAME $$
+-- drop database if exists $$DATABASE_NAME$$;                                                     -- $$ DATABASE_NAME $$
 
 -- Create database $$DATABASE_NAME$$, with utf8 and utf8_general_ci
 create database if not exists $$DATABASE_NAME$$ character set utf8 collate utf8_general_ci;       -- $$ DATABASE_NAME $$
@@ -42,19 +43,19 @@ use $$DATABASE_NAME$$;                                                          
 
 -- 1. T1. mails table to store emails that need to be sent
 create table if not exists mails (
-    mailId                                    int(10) unsigned                 not null auto_increment,
-    sender                                    varchar (64)                     default null,
-    senderEmail                               varchar (128)                    default null,
-    recipients                                varchar (4096)                   not null,
-    ccRecipients                              varchar (4096)                   default null,
-    bccRecipients                             varchar (4096)                   default null,
-    replyTo                                   varchar (128)                    default null,
-    subject                                   varchar (236)                    not null,
-    subjectPrefix                             varchar (16)                     default null,
+    mailId                                    int( 10 ) unsigned               not null auto_increment,
+    sender                                    varchar ( 64 )                   default null,
+    senderEmail                               varchar ( 128 )                  default null,
+    recipients                                varchar ( 4096 )                 not null,
+    ccRecipients                              varchar ( 4096 )                 default null,
+    bccRecipients                             varchar ( 4096 )                 default null,
+    replyTo                                   varchar ( 128 )                  default null,
+    subject                                   varchar ( 236 )                  not null,
+    subjectPrefix                             varchar ( 16 )                   default null,
     body                                      text,
-    ready                                     tinyint(1) unsigned              not null default 0,
-    hasAttachments                            tinyint(1) unsigned              not null default 0,
-    importance                                tinyint(1) unsigned              not null default 0,
+    ready                                     tinyint( 1 ) unsigned            not null default 0,
+    hasAttachments                            tinyint( 1 ) unsigned            not null default 0,
+    importance                                tinyint( 1 ) unsigned            not null default 0,
     timestamp                                 datetime                         default null,
     created                                   datetime                         not null,
     KEY                                       mailId ( mailId )
@@ -64,13 +65,13 @@ create table if not exists mails (
 
 -- 2. T2. mailsLog table to store log of emails that were sent
 create table if not exists mailsLog (
-    logId                                     int(10) unsigned                 not null auto_increment,
-    apiKeyId                                  int(10) unsigned                 not null,
-    mailId                                    int(10) unsigned                 default null,
-    sender                                    varchar (128)                    not null,
-    recipient                                 varchar (4096)                   not null,
-    subject                                   varchar (255)                    not null,
-    size                                      int(10) unsigned                 default null,
+    logId                                     int( 10 ) unsigned               not null auto_increment,
+    apiKeyId                                  int( 10 ) unsigned               not null,
+    mailId                                    int( 10 ) unsigned               default null,
+    sender                                    varchar ( 128 )                  not null,
+    recipient                                 varchar ( 4096 )                 not null,
+    subject                                   varchar ( 255 )                  not null,
+    size                                      int( 10 ) unsigned               default null,
     timestamp                                 datetime                         not null,
     KEY                                       logId ( logId )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
@@ -79,10 +80,10 @@ create table if not exists mailsLog (
 
 -- 3. T3. mailAttachments table to store attachments, that need to be sent (if any)
 create table if not exists mailAttachments (
-    mailAttachmentId                          int(10) unsigned                 not null auto_increment,
-    mailId                                    int(10) unsigned                 not null,
-    filename                                  varchar (1024)                   not null,
-    filesize                                  int(10) unsigned                 not null,
+    mailAttachmentId                          int( 10 ) unsigned               not null auto_increment,
+    mailId                                    int( 10 ) unsigned               not null,
+    filename                                  varchar ( 1024 )                 not null,
+    filesize                                  int( 10 ) unsigned               not null,
     attachment                                longblob                         not null,
     created                                   datetime                         not null,
     KEY                                       mailAttachmentId ( mailAttachmentId )
@@ -92,10 +93,10 @@ create table if not exists mailAttachments (
 
 -- 4. T4. mailApiKeys table to store mail API keys, valid ones we honor to dispatch email
 create table if not exists mailApiKeys (
-    apiId                                     int(10) unsigned                 not null auto_increment,
-    apiKey                                    varchar (32)                     not null,
-    email                                     varchar (128)                    not null,
-    active                                    tinyint(1) unsigned              not null default 0,
+    apiId                                     int( 10 ) unsigned               not null auto_increment,
+    apiKey                                    varchar ( 32 )                   not null,
+    email                                     varchar ( 128 )                  not null,
+    active                                    tinyint( 1 ) unsigned            not null default 0,
     created                                   datetime                         not null,
     lastUpdate                                datetime                         not null,
     KEY                                       apiId  ( apiId ),
@@ -431,12 +432,46 @@ end //
 
 delimiter ;
 
+drop procedure if exists populateApiKeys;
+
+delimiter //
+
+-- 13. P9: populateApiKeys SP - populateApiKeys stored procedure to insert API keys into mailApiKeys table.
+create procedure populateApiKeys()
+begin
+    declare l_apiKeysCount                    int( 10 ) unsigned;
+
+    select count(*) into l_apiKeysCount from mailApiKeys;
+
+    if l_apiKeysCount = 0 then
+
+    apiId                                     int(10) unsigned                 not null auto_increment,
+    apiKey                                    varchar (32)                     not null,
+    email                                     varchar (128)                    not null,
+    active                                    tinyint(1) unsigned              not null default 0,
+    created                                   datetime                         not null,
+    lastUpdate                                datetime                         not null,
+
+        insert mailApiKeys ( apiKey, email, active, created, lastUpdate)
+        values ('$$MAIL_API_KEY$$',                                             // $$ MAIL_API_KEY $$
+                '$$ADMIN_EMAIL$$',                                              // $$ ADMIN_EMAIL $$
+                1, utc_timestamp(), utc_timestamp());
+
+    end if;
+end //
+
+delimiter ;
+
+call populateApiKeys();
+
+drop procedure populateApiKeys();
+
 -- drop table if exists appLogs;
 
--- 13. T5. appLogs table to store application logs.
+-- 14. T5. appLogs table to store application logs.
 create table if not exists appLogs (
-    id                                        int ( 10 ) unsigned              not null auto_increment,
-    log                                       varchar( 255 )                   not null,
+    id                                        int( 10 ) unsigned              not null auto_increment,
+    log                                       varchar ( 255 )                   not null,
     created                                   datetime                         not null,
     key ( id )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
@@ -445,13 +480,13 @@ drop procedure if exists addAppLog;
 
 delimiter //
 
--- 14. P9. addAppLog stored procedure to add a certain string or log to the appLogs table.
+-- 15. P9. addAppLog stored procedure to add a certain string or log to the appLogs table.
 create procedure addAppLog(
     in            p_log                       varchar( 255 )
 )
 begin
 
-    declare l_logId                           int ( 10 ) unsigned default 0;
+    declare l_logId                           int( 10 ) unsigned default 0;
 
     insert appLogs (log, created)
     values ( p_log, utc_timestamp() );
@@ -467,9 +502,9 @@ drop procedure if exists showLatestAppLogs;
 
 delimiter //
 
--- 15. P10. showLatestAppLogs stored procedure to fetch the latest configurable amount of logs inserted.
+-- 16. P11. showLatestAppLogs stored procedure to fetch the latest configurable amount of logs inserted.
 create procedure showLatestAppLogs(
-    in            p_count                     int ( 10 ) unsigned
+    in            p_count                     int( 10 ) unsigned
 )
 begin
     select id, log, created
@@ -485,7 +520,7 @@ drop procedure if exists clearAppLogs;
 
 delimiter //
 
--- 16. P11. clearAppLogs stored procedure to remove all entries from appLogs table.
+-- 17. P12. clearAppLogs stored procedure to remove all entries from appLogs table.
 create procedure clearAppLogs()
 begin
     truncate table appLogs;
@@ -496,14 +531,14 @@ delimiter ;
 
 -- drop table if exists systemSettings;
 
--- 17. T6. systemSettings table - table to store system settings, queried at session start and other places.
+-- 18. T6. systemSettings table - table to store system settings, queried at session start and other places.
 create table if not exists systemSettings (
-    id                                        int ( 10 ) unsigned              not null auto_increment,
-    name                                      varchar( 32 )                    not null,
-    value                                     varchar( 255 )                   not null,
-    enabled                                   tinyint ( 1 )                    unsigned default 0,
-    created                                   datetime                         not null,
-    lastUpdate                                datetime                         not null,
+    id                                        int( 10 ) unsigned              not null auto_increment,
+    name                                      varchar ( 32 )                  not null,
+    value                                     varchar ( 255 )                 not null,
+    enabled                                   tinyint( 1 )                    unsigned default 0,
+    created                                   datetime                        not null,
+    lastUpdate                                datetime                        not null,
     KEY ( id ),
     UNIQUE INDEX ix_name ( name )
 ) ENGINE=InnoDB DEFAULT CHARACTER SET=utf8;
@@ -512,11 +547,11 @@ drop procedure if exists populateSystemSettings;
 
 delimiter //
 
--- 18. P12: populateSystemSettings SP - to get initial set of settings required for app.
+-- 19. P13: populateSystemSettings SP - to get initial set of settings required for app.
 create procedure populateSystemSettings()
 begin
 
-    declare l_settingsCount                   int ( 10 ) unsigned;
+    declare l_settingsCount                   int( 10 ) unsigned;
 
     select count(*) into l_settingsCount from systemSettings;
 
@@ -538,7 +573,7 @@ drop procedure if exists getSystemSetting;
 
 delimiter //
 
--- 19. P13: getSystemSetting SP - to get the value for a provided setting name.
+-- 20. P14: getSystemSetting SP - to get the value for a provided setting name.
 create procedure getSystemSetting(
     in            p_name                      varchar ( 32 )
 )
