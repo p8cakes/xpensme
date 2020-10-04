@@ -249,7 +249,7 @@ begin
         active,
         email
     from
-        mailApiKeys2
+        mailApiKeys
     where
         apiKey = p_apiKey;
 end //
@@ -403,7 +403,7 @@ create procedure deleteEmail (
 )
 begin
 
-    declare l_mailId                          int( 10 ) unsigned = null;
+    declare l_mailId                          int( 10 ) unsigned default null;
 
     select mailId
         into l_mailId
@@ -446,8 +446,8 @@ begin
     if l_apiKeysCount = 0 then
 
         insert mailApiKeys ( apiKey, email, active, created, lastUpdate)
-        values ('$$MAIL_API_KEY$$',                                             // $$ MAIL_API_KEY $$
-                '$$ADMIN_EMAIL$$',                                              // $$ ADMIN_EMAIL $$
+        values ('$$MAIL_API_KEY$$',                                             -- $$ MAIL_API_KEY $$
+                '$$ADMIN_EMAIL$$',                                              -- $$ ADMIN_EMAIL $$
                 1, utc_timestamp(), utc_timestamp());
 
     end if;
@@ -457,7 +457,7 @@ delimiter ;
 
 call populateApiKeys();
 
-drop procedure populateApiKeys();
+drop procedure populateApiKeys;
 
 -- drop table if exists appLogs;
 
@@ -560,7 +560,7 @@ delimiter ;
 
 call populateSystemSettings();
 
-drop procedure populateSystemSettings();
+drop procedure populateSystemSettings;
 
 drop procedure if exists getSystemSetting;
 
