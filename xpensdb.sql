@@ -31,12 +31,12 @@
 --      1. Sundar Krishnamurthy         sundar@passion8cakes.com               9/25/2020       Initial file created.
 
 -- Very, very, very bad things happen if you uncomment this line below. Do at your peril, you have been warned!
--- drop database if exists $$DATABASE_NAME$$;                                                     -- $$ DATABASE_NAME $$
+-- drop database if exists $$DATABASE_NAME$$;                                                        -- $$ DATABASE_NAME $$
 
 -- Create database $$DATABASE_NAME$$, with utf8 and utf8_general_ci
 create database if not exists $$DATABASE_NAME$$ character set utf8 collate utf8_general_ci;       -- $$ DATABASE_NAME $$
 
--- Employ $$DATABASE_NAME$$
+-- Employ $$ DATABASE_NAME $$
 use $$DATABASE_NAME$$;                                                                            -- $$ DATABASE_NAME $$
 
 -- drop table if exists mails;
@@ -96,6 +96,7 @@ create table if not exists mailApiKeys (
     apiId                                     int( 10 ) unsigned               not null auto_increment,
     apiKey                                    varchar ( 32 )                   not null,
     email                                     varchar ( 128 )                  not null,
+    name                                      varchar ( 32 )                   not null,
     active                                    tinyint( 1 ) unsigned            not null default 0,
     created                                   datetime                         not null,
     lastUpdate                                datetime                         not null,
@@ -247,7 +248,8 @@ begin
     select
         apiId as apiKeyId,
         active,
-        email
+        email,
+        name
     from
         mailApiKeys
     where
@@ -446,9 +448,10 @@ begin
     if l_apiKeysCount = 0 then
 
         insert mailApiKeys ( apiKey, email, active, created, lastUpdate)
-        values ('$$MAIL_API_KEY$$',                                             -- $$ MAIL_API_KEY $$
-                '$$ADMIN_EMAIL$$',                                              -- $$ ADMIN_EMAIL $$
-                1, utc_timestamp(), utc_timestamp());
+         values ('$$MAIL_API_KEY$$',                                             -- $$ MAIL_API_KEY $$ 
+                 '$$SENDER_EMAIL$$',                                             -- $$ SENDER_EMAIL $$
+                 '$$SENDER_NAME$$',                                              -- $$ SENDER_NAME $$
+                 1, utc_timestamp(), utc_timestamp());
 
     end if;
 end //
@@ -475,7 +478,7 @@ delimiter //
 
 -- 15. P9. addAppLog stored procedure to add a certain string or log to the appLogs table.
 create procedure addAppLog(
-    in            p_log                       varchar( 255 )
+    in            p_log                       varchar ( 255 )
 )
 begin
 
