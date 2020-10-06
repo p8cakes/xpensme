@@ -447,7 +447,7 @@ begin
 
     if l_apiKeysCount = 0 then
 
-        insert mailApiKeys ( apiKey, email, active, created, lastUpdate)
+        insert mailApiKeys ( apiKey, email, name, active, created, lastUpdate)
          values ('$$MAIL_API_KEY$$',                                             -- $$ MAIL_API_KEY $$ 
                  '$$SENDER_EMAIL$$',                                             -- $$ SENDER_EMAIL $$
                  '$$SENDER_NAME$$',                                              -- $$ SENDER_NAME $$
