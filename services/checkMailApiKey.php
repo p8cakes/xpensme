@@ -9,9 +9,14 @@
 //
 // Output JSON:
 //   {"errorCode":0,
+//    "dataFound":true;
 //    "apiKeyId":101,
 //    "active":1,
-//    "email":"janedoe@email.com"}
+//    "email":"janedoe@email.com",
+//    "name":"Jane Doe"}
+//
+//   {"errorCode":0,
+//    "dataFound":false}
 //
 //   {"errorCode":1,
 //    "error":"Long exception message"}
@@ -35,7 +40,7 @@
 //   None
 //
 // Revisions:
-//     1. Sundar Krishnamurthy          sundar@passion8cakes.com       10/03/2020      Initial file created.
+//     1. Sundar Krishnamurthy          sundar@passion8cakes.com       10/06/2020      Initial file created.
 
 ini_set('session.cookie_httponly', TRUE);           // Mitigate XSS
 ini_set('session.session.use_only_cookies', TRUE);  // No session fixation
@@ -58,7 +63,7 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
     exit();
 }   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
 
-// We need a session variable that may be saved to this table, look up with sessionID and key
+// Verify that we have a valid API key that is being used to post to this service, and request emanates from same server.
 if (($_SERVER["REQUEST_METHOD"] === "POST") &&
     (isset($_SERVER["HTTP_APIKEY"])) &&
     ($_SERVER["HTTP_APIKEY"] === "$$API_KEY$$") &&                     // $$ API_KEY $$
@@ -68,25 +73,32 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
     // We found a valid body to process
     if ($postBody !== "") {
-        $active       = 0;
-        $apiKeyId     = 0;
-        $email        = null;
+        $dataFound    = false;
 
+        $bitmask      = 0;
         $errorCode    = 0;
         $errorMessage = null;
         $query        = null;
         $dump         = false;
 
-        $request      = json_decode($postBody, true);
+        $responseJson = array();
 
-        $mailApiKey   = $request["mailApiKey"];
+        $request      = json_decode($postBody, true);
 
         if (array_key_exists("dump", $request)) {
             $dump = boolval($request["dump"]);
         }   //  End if (in_array("dump", $postBody))
 
-        // We have valid data coming for mailApiKey
-        if (strlen($mailApiKey) === 32) {
+        if (array_key_exists("mailApiKey", $request)) {
+            $mailApiKey   = $request["mailApiKey"];
+
+            if (strlen($mailApiKey) === 32) {
+                $bitmask = 1;
+            }   //  End if (strlen($mailApiKey) === 32)
+        }   //  End if (in_array("mailApiKey", $postBody))
+
+        // We have valid data coming in
+        if ($bitmask === 1) {
 
             // Update session key and value in DB for sessionId
             // Connect to DB
@@ -126,11 +138,12 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                     } else if ($row = mysqli_fetch_assoc($result)) {
 
                         if ($row["active"] != null) {
-                            $active = intval($row["active"]);
+                            $dataFound                = true;
+                            $responseJson["active"]   = intval($row["active"]);
+                            $responseJson["apiKeyId"] = intval($row["apiKeyId"]);
+                            $responseJson["email"]    = $row["email"];
+                            $responseJson["name"]     = $row["name"];
                         }   //  End if ($row["active"] != null)
-
-                        $apiKeyId = intval($row["apiKeyId"]); 
-                        $email    = $row["email"];
 
                         // Free result
                         mysqli_free_result($result);
@@ -141,16 +154,12 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                 mysqli_close($con);
             }   //  End if (!$con)
 
-            $responseJson              = array();
             $responseJson["errorCode"] = $errorCode;
+            $responseJson["dataFound"] = $dataFound;
 
-            if ($errorMessage === null) {
-                $responseJson["active"]   = $active;
-                $responseJson["email"]    = $email;
-                $responseJson["apiKeyId"] = $apiKeyId;
-            } else {
+            if ($errorMessage != null) {
                 $responseJson["error"] = $errorMessage;
-            }   //  End if ($errorMessage === null)
+            }   //  End if ($errorMessage != null)
 
             if (($dump === true) && ($query !== null)) {
                 $responseJson["query"] = $query;
@@ -160,7 +169,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
             header('Content-Type: application/json; charset=utf-8');
             print(utf8_encode(json_encode($responseJson)));
 
-        }   //  End if (strlen($mailApiKey) === 32) {
+        }   //  End if ($bitmask === 1)
     }   //  End if ($postBody !== "")
 }   //  End if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
