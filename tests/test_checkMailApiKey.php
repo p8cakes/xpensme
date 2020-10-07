@@ -173,5 +173,39 @@ if ($response === "") {
     echo("3. Fail: Non-empty response retrieved for invalid length API key: " . $response . "<br>");
 }   //  End if ($response === "")
 
+// STEP 4 - Negative use-case
+// ********* Call Web Service to with no mailApiKey parameter *******************
+$ch                     = curl_init();
+$elements               = array();
+
+curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/checkMailApiKey.php");
+
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    'ApiKey: $$API_KEY$$',           // $$ API_KEY $$
+    'Content-Type: application/x-www-form-urlencoded',
+    'Accept: application/json'));
+
+curl_setopt($ch, CURLOPT_SSLVERSION, 6);
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, urlencode(utf8_encode(json_encode($elements))));
+
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+session_write_close();
+
+$response = curl_exec($ch);
+
+curl_close($ch);
+
+$checkResponse = json_decode(utf8_decode($response), true);
+$errorCode     = intval($checkResponse["errorCode"]);
+
+if ($errorCode === 4) {
+    echo("4. Pass: Absent mailApiKey parameter has resulted in proper error message.<br>");
+} else {
+    echo("4. Fail: Absent mailApiKey parameter resulted in this response: " . $errorCode . "<br>");
+}   //  End if ($errorCode === 4)
+
 ob_end_flush();
 ?>
