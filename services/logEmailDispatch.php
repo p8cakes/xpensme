@@ -63,7 +63,7 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
 // Verify that we have a valid API key that is being used to post to this service, and request emanates from same server.
 if (($_SERVER["REQUEST_METHOD"] === "POST") &&
     (isset($_SERVER["HTTP_APIKEY"])) &&
-    ($_SERVER["HTTP_APIKEY"] === "") &&                     // $$ API_KEY $$
+    ($_SERVER["HTTP_APIKEY"] === "$$API_KEY$$") &&                     // $$ API_KEY $$
     ($_SERVER["SERVER_ADDR"] === $_SERVER["REMOTE_ADDR"])) {
 
     $postBody = utf8_decode(urldecode(file_get_contents("php://input")));
@@ -162,6 +162,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
                     // Unable to fetch result, display error message
                     if (!$result) {
+
                         $errorCode     = 3;
                         $errorMessage  = "Invalid query: " . mysqli_error($con) . "<br/>";
                         $errorMessage .= ("Whole query: " . $query);
@@ -192,7 +193,10 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
             header('Content-Type: application/json; charset=utf-8');
             print(utf8_encode(json_encode($responseJson)));
 
-        }   //  End if ($bitmask === 1)
+        } else {
+            $errorCode    = 4;
+            $errorMessage = "logEmailDispatch: Not all parameters were found to process this input";
+        }   //  End if ($bitmask === 31)
     }   //  End if ($postBody !== "")
 }   //  End if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
