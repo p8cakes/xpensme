@@ -168,7 +168,9 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
             // Send result back
             header('Content-Type: application/json; charset=utf-8');
             print(utf8_encode(json_encode($responseJson)));
-
+        } else {
+            $errorCode    = 4;
+            $errorMessage = "checkMailApiKey: Not all parameters were found to process this input";
         }   //  End if ($bitmask === 1)
     }   //  End if ($postBody !== "")
 }   //  End if (($_SERVER["REQUEST_METHOD"] === "POST") &&
