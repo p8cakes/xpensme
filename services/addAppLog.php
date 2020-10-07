@@ -79,7 +79,6 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
         $errorCode    = 0;
         $errorMessage = null;
-
         $log          = null;
 
         $responseJson = array();
@@ -88,7 +87,6 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
         // Check if name is part of the input json set
         if (array_key_exists("log", $userRequest)) {
-
             $log = trim($userRequest["log"]);
 
             if (($log !== "") && ($log !== null)) {
@@ -98,7 +96,6 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
         // Check if dump is part of the input json set
         if (array_key_exists("dump", $userRequest)) {
-
             $dump = boolval($userRequest["dump"]);
         }   // End if (array_key_exists("dump", $userRequest))
 
@@ -123,8 +120,6 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                     $errorMessage = "Could not connect to the database.";
                 } else {
                     // All individual parameters need to be checked
-
-                    // log
                     $useLog = mysqli_real_escape_string($con, $log);
 
                     if (strlen($useLog) > 255) {
@@ -139,14 +134,13 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
                     // Unable to fetch result, display error message
                     if (!$result) {
+ 
                         $errorCode     = 3;
                         $errorMessage  = "Invalid query: " . mysqli_error($con) . "<br/>";
                         $errorMessage .= ("Whole query: " . $query);
-
                     } else if ($row = mysqli_fetch_assoc($result)) {
 
                         if (array_key_exists("logId", $row)) {
-
                             $responseJson["logId"] = $row["logId"];
                         }   //  End if (array_key_exists("logId", $row))
 
