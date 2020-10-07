@@ -300,6 +300,7 @@ delimiter //
 -- 9. P5 logEmailDispatch stored procedure to change the status of an email as ready to send
 create procedure logEmailDispatch (
     in p_apiKeyId                             int( 10 ) unsigned,
+    in p_mailId                               int( 10 ) unsigned,
     in p_senderEmail                          varchar ( 128 ),
     in p_recipients                           varchar ( 4096 ),
     in p_subject                              varchar ( 255 ),
@@ -309,6 +310,7 @@ begin
 
     insert mailsLog (
         apiKeyId,
+        mailId,
         sender,
         recipient,
         subject,
@@ -316,6 +318,7 @@ begin
         timestamp
     ) values (
         p_apiKeyId,
+        p_mailId,
         p_senderEmail,
         p_recipients,
         p_subject,
