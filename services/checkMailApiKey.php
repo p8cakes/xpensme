@@ -74,6 +74,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
     // We found a valid body to process
     if ($postBody !== "") {
         $dataFound    = false;
+        $mailApiKey   = null;
 
         $bitmask      = 0;
         $errorCode    = 0;
@@ -87,73 +88,79 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
         if (array_key_exists("dump", $request)) {
             $dump = boolval($request["dump"]);
-        }   //  End if (in_array("dump", $postBody))
+        }   //  End if (array_key_exists("dump", $request))
 
         if (array_key_exists("mailApiKey", $request)) {
-            $mailApiKey   = $request["mailApiKey"];
-
-            if (strlen($mailApiKey) === 32) {
-                $bitmask = 1;
-            }   //  End if (strlen($mailApiKey) === 32)
-        }   //  End if (in_array("mailApiKey", $postBody))
+            $mailApiKey = $request["mailApiKey"];
+            $bitmask    = 1;
+        }   //  End if (array_key_exists("mailApiKey", $request))
 
         // We have valid data coming in
         if ($bitmask === 1) {
 
-            // Update session key and value in DB for sessionId
-            // Connect to DB
-            $con = mysqli_connect($global_dbServer, $global_dbUsername, $global_dbPassword);
+            // Only proceed if we have a 32-character mailApiKey
+            if (strlen($mailApiKey) === 32) {
+                // Update session key and value in DB for sessionId
+                // Connect to DB
+                $con = mysqli_connect($global_dbServer, $global_dbUsername, $global_dbPassword);
 
-            // Unable to connect, display error message
-            if (!$con) {
-                $errorCode    = 1;
-                $errorMessage = "Could not connect to database server.";
-            } else {
-                // DB selected will be selected Database on server
-                $db_selected = mysqli_select_db($con, $global_dbName);
-
-               // Unable to use DB, display error message
-               if (!$db_selected) {
-                    $errorCode    = 2;
-                    $errorMessage = "Could not connect to the database.";
+                // Unable to connect, display error message
+                if (!$con) {
+                    $errorCode    = 1;
+                    $errorMessage = "Could not connect to database server.";
                 } else {
+                    // DB selected will be selected Database on server
+                    $db_selected = mysqli_select_db($con, $global_dbName);
 
-                    $useMailApiKey = mysqli_real_escape_string($con, $mailApiKey);
+                   // Unable to use DB, display error message
+                   if (!$db_selected) {
+                        $errorCode    = 2;
+                        $errorMessage = "Could not connect to the database.";
+                    } else {
 
-                    if (strlen($useMailApiKey) > 32) {
-                        $useMailApiKey = substr($useMailApiKey, 0, 32);
-                    }   //  End if (strlen($useMailApiKey) > 32)
+                        $useMailApiKey = mysqli_real_escape_string($con, $mailApiKey);
 
-                    // This is the query we will run to check the validity of mailApiKey in the DB
-                    $query = "call checkMailApiKey('$useMailApiKey');";
+                        if (strlen($useMailApiKey) > 32) {
+                            $useMailApiKey = substr($useMailApiKey, 0, 32);
+                        }   //  End if (strlen($useMailApiKey) > 32)
 
-                    // Result of query
-                    $result = mysqli_query($con, $query);
+                        // This is the query we will run to check the validity of mailApiKey in the DB
+                        $query = "call checkMailApiKey('$useMailApiKey');";
 
-                    // Unable to fetch result, display error message
-                    if (!$result) {
-                        $errorCode     = 3;
-                        $errorMessage  = "Invalid query: " . mysqli_error($con) . "<br/>";
-                        $errorMessage .= ("Whole query: " . $query);
-                    } else if ($row = mysqli_fetch_assoc($result)) {
+                        // Result of query
+                        $result = mysqli_query($con, $query);
 
-                        if ($row["active"] != null) {
-                            $dataFound                = true;
-                            $responseJson["active"]   = intval($row["active"]);
-                            $responseJson["apiKeyId"] = intval($row["apiKeyId"]);
-                            $responseJson["email"]    = $row["email"];
-                            $responseJson["name"]     = $row["name"];
-                        }   //  End if ($row["active"] != null)
+                        // Unable to fetch result, display error message
+                        if (!$result) {
+                            $errorCode     = 3;
+                            $errorMessage  = "Invalid query: " . mysqli_error($con) . "<br/>";
+                            $errorMessage .= ("Whole query: " . $query);
+                        } else if ($row = mysqli_fetch_assoc($result)) {
 
-                        // Free result
-                        mysqli_free_result($result);
-                    }   //  End if (!$result)
-                }   //  End if (!$db_selected)
+                            if ($row["active"] != null) {
+                                $dataFound                = true;
+                                $responseJson["active"]   = intval($row["active"]);
+                                $responseJson["apiKeyId"] = intval($row["apiKeyId"]);
+                                $responseJson["email"]    = $row["email"];
+                                $responseJson["name"]     = $row["name"];
+                            }   //  End if ($row["active"] != null)
 
-                // Close connection
-                mysqli_close($con);
-            }   //  End if (!$con)
+                            // Free result
+                            mysqli_free_result($result);
+                        }   //  End if (!$result)
+                    }   //  End if (!$db_selected)
 
+                    // Close connection
+                    mysqli_close($con);
+                }   //  End if (!$con)
+            }   //  End if (strlen($mailApiKey) === 32)
+        } else {
+            $errorCode    = 4;
+            $errorMessage = "checkMailApiKey: Not all parameters were found to process this input";
+        }   //  End if ($bitmask === 1)
+
+        // Only send responses when the mailApiKey is 32 characters, or we need to ferry error message back
+        if ((strlen($mailApiKey) == 32) || ($errorCode > 0)) {
             $responseJson["errorCode"] = $errorCode;
             $responseJson["dataFound"] = $dataFound;
 
@@ -168,10 +175,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
             // Send result back
             header('Content-Type: application/json; charset=utf-8');
             print(utf8_encode(json_encode($responseJson)));
-        } else {
-            $errorCode    = 4;
-            $errorMessage = "checkMailApiKey: Not all parameters were found to process this input";
-        }   //  End if ($bitmask === 1)
+        }   //  End if ((strlen($mailApiKey) == 32) || ($errorCode > 0))
     }   //  End if ($postBody !== "")
 }   //  End if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
