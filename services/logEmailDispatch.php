@@ -71,6 +71,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
     // We found a valid body to process
     if ($postBody !== "") {
         $apiKeyId     = null;
+        $mailId       = "null";
         $sender       = null;
         $recipient    = null;
         $subject      = null;
@@ -95,8 +96,13 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
             $bitmask |= 1;
         }   //  End if (array_key_exists("apiKeyId", $request))
 
+        // Optional mailId, employ if present
+        if (array_key_exists("mailId", $request)) {
+            $mailId = intval($request["mailId"]);
+        }   //  End if (array_key_exists("mailId", $request))
+
         if (array_key_exists("sender", $request)) {
-            $sender = $request["sender"]);
+            $sender = $request["sender"];
             $bitmask |= 2;
         }   //  End if (array_key_exists("sender", $request))
 
@@ -155,7 +161,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                     }   //  End if (strlen($useSubject) > 255)
 
                     // This is the query we will run to check the validity of mailApiKey in the DB
-                    $query = "call logEmailDispatch($apiKeyId, '$useSender', '$useRecipient', '$useSubject', $size);";
+                    $query = "call logEmailDispatch($apiKeyId, $mailId, '$useSender', '$useRecipient', '$useSubject', $size);";
 
                     // Result of query
                     $result = mysqli_query($con, $query);
@@ -178,25 +184,24 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                 // Close connection
                 mysqli_close($con);
             }   //  End if (!$con)
-
-            $responseJson["errorCode"] = $errorCode;
-
-            if ($errorMessage != null) {
-                $responseJson["error"] = $errorMessage;
-            }   //  End if ($errorMessage != null)
-
-            if (($dump === true) && ($query !== null)) {
-                $responseJson["query"] = $query;
-            }   //  End if (($dump === true) && ($query !== null))
-
-            // Send result back
-            header('Content-Type: application/json; charset=utf-8');
-            print(utf8_encode(json_encode($responseJson)));
-
         } else {
             $errorCode    = 4;
             $errorMessage = "logEmailDispatch: Not all parameters were found to process this input";
         }   //  End if ($bitmask === 31)
+
+        $responseJson["errorCode"] = $errorCode;
+
+        if ($errorMessage != null) {
+            $responseJson["error"] = $errorMessage;
+        }   //  End if ($errorMessage != null)
+
+        if (($dump === true) && ($query !== null)) {
+            $responseJson["query"] = $query;
+        }   //  End if (($dump === true) && ($query !== null))
+
+        // Send result back
+        header('Content-Type: application/json; charset=utf-8');
+        print(utf8_encode(json_encode($responseJson)));
     }   //  End if ($postBody !== "")
 }   //  End if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
