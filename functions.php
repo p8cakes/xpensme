@@ -20,6 +20,9 @@ $global_dbName = "$$DATABASE_NAME$$";                           // $$ DATABASE_N
 $global_dbUsername = "$$DB_USERNAME$$";                         // $$ DB_USERNAME $$
 $global_dbPassword = "$$DB_PASSWORD$$";                         // $$ DB_PASSWORD $$
 
+$global_email_username      = "$$EMAIL_USERNAME$$";             // $$ EMAIL_USERNAME $$
+$global_email_password      = "$$EMAIL_PASSWORD$$";             // $$ EMAIL_PASSWORD $$
+
 $global_siteUrl = "$$FULL_URL$$";                               // $$ FULL_URL $$
 $global_siteCookieQualifier = "$$SITE_COOKIE_QUALIFIER$$";      // $$ SITE_COOKIE_QUALIFIER $$
 $global_useDomain = false;
