@@ -110,7 +110,6 @@ delimiter //
 
 -- 5. P1. addEmail stored procedure to fetch the active and email value for furnished API key.
 create procedure addEmail (
-    in p_apiKey                              varchar ( 32 ),
     in p_sender                              varchar ( 64 ),
     in p_senderEmail                         varchar ( 128 ),
     in p_recipients                          varchar ( 4096 ),
@@ -127,50 +126,40 @@ create procedure addEmail (
 )
 begin
 
-    declare l_apiId                          int( 10 ) unsigned default null;
+   insert mails (
+       sender,
+       senderEmail,
+       recipients,
+       ccRecipients,
+       bccRecipients,
+       replyTo,
+       subject,
+       subjectPrefix,
+       body,
+       ready,
+       hasAttachments,
+       importance,
+       timestamp,
+       created
+    ) values (
+       p_sender,
+       p_senderEmail,
+       p_recipients,
+       p_ccRecipients,
+       p_bccRecipients,
+       p_replyTo,
+       p_subject,
+       p_subjectPrefix,
+       p_body,
+       p_markMailAsReady,
+       p_hasAttachments,
+       p_importance,
+       p_timestamp,
+       utc_timestamp()
+    );
 
-    select apiId into l_apiId
-    from mailApiKeys
-    where apiKey = p_apiKey
-    and active = 1;
+    select last_insert_id() as mailId;
 
-    if l_apiId is not null then
-
-       insert mails (
-           sender,
-           senderEmail,
-           recipients,
-           ccRecipients,
-           bccRecipients,
-           replyTo,
-           subject,
-           subjectPrefix,
-           body,
-           ready,
-           hasAttachments,
-           importance,
-           timestamp,
-           created
-        ) values (
-           p_sender,
-           p_senderEmail,
-           p_recipients,
-           p_ccRecipients,
-           p_bccRecipients,
-           p_replyTo,
-           p_subject,
-           p_subjectPrefix,
-           p_body,
-           p_markMailAsReady,
-           p_hasAttachments,
-           p_importance,
-           p_timestamp,
-           utc_timestamp()
-        );
-
-        select last_insert_id() as mailId;
-
-    end if;
 end //
 
 delimiter ;
