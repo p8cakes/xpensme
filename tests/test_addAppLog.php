@@ -9,8 +9,6 @@
 //
 // Query Parameters:
 //    s: Magic key that should be present in query-string for this test to succeed
-//    m: Message that you want to log to appLogs table
-//    q: Quiet mode. A value of 1 does not generate any output back
 //
 // Custom Headers:
 //    None
@@ -41,8 +39,10 @@ ob_start();
 // Start the initial session
 session_start();
 
-$quiet = 0;
-$message = "Foo Bar";
+// Break out of test if key not present in incoming request
+if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
+    exit();
+}   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
 
 // First off, check if the application is being used by someone not typing the actual server name in the header
 if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
@@ -51,25 +51,12 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
     exit();
 }   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
 
-// Break out of test if key not present in incoming request
-if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
-    exit();
-}   //  End if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$"))      // $$ TEST_QUERY_KEY $$
-
-if (isset($_GET["m"])) {
-    $message = $_GET["m"];
-}   //  End if ((isset($_GET["m"]))
-
-if (isset($_GET["q"])) {
-    $quiet = intval($_GET["q"]);
-}   //  End if ((isset($_GET["q"]))
-
 // STEP 1 - Positive use-case
 // ********* Call Web Service with valid log string, verify you get back a non-zero log ID ********** //
 $ch               = curl_init();
 
 $elements         = array();
-$elements["log"]  = $message;
+$elements["log"]  = "Foo Bar";
 $elements["dump"] = true;
 
 curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/addAppLog.php");
@@ -96,13 +83,11 @@ $checkResponse = json_decode(utf8_decode($response), true);
 $errorCode     = intval($checkResponse["errorCode"]);
 
 if ($errorCode === 0) {
-    if ($quiet !== 1) {
-        $logId = $checkResponse["logId"];
-        echo("logId: $logId");
-    }   //  End if ($quiet === 0)
+    $logId = $checkResponse["logId"];
+    echo("logId is $logId");
 } else {
-    echo("ErrorCode: " . $errorCode . "<br>");
-    echo("Error: " . $checkResponse["error"]);
-}   //  End if ($errorCode === 0)  
+    echo($checkResponse);
+}
+
 ob_end_flush();
 ?>
