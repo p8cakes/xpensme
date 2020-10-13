@@ -75,7 +75,7 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
 // Verify that we have a valid API key that is being used to post to this service, and request emanates from same server.
 if (($_SERVER["REQUEST_METHOD"] === "POST") &&
     (isset($_SERVER["HTTP_APIKEY"])) &&
-    ($_SERVER["HTTP_APIKEY"] === "22c42fa321e74e9d8c687372195a6664") &&                     // $$ API_KEY $$
+    ($_SERVER["HTTP_APIKEY"] === "$$API_KEY$$") &&                     // $$ API_KEY $$
     ($_SERVER["SERVER_ADDR"] === $_SERVER["REMOTE_ADDR"])) {
 
     $postBody = utf8_decode(urldecode(file_get_contents("php://input")));
