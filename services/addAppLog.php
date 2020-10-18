@@ -36,7 +36,7 @@
 //    None
 //
 // Revisions:
-//    1. Sundar Krishnamurthy          sundar@passion8cakes.com       10/25/2020      Initial file created.
+//    1. Sundar Krishnamurthy          sundar@passion8cakes.com       10/17/2020      Initial file created.
 
 ini_set('session.cookie_httponly', TRUE);           // Mitigate XSS
 ini_set('session.session.use_only_cookies', TRUE);  // No session fixation
@@ -79,16 +79,19 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
         $errorCode    = 0;
         $errorMessage = null;
+
         $log          = null;
 
         $responseJson = array();
  
         $userRequest  = json_decode($postBody, true);
 
-        // Check if name is part of the input json set
+        // Check if log is part of the input json set
         if (array_key_exists("log", $userRequest)) {
+
             $log = trim($userRequest["log"]);
 
+            // We found a non-null, non-empty log to write to DB
             if (($log !== "") && ($log !== null)) {
                 $bitmask  = 1;
             }   //  End if (($log !== "") && ($log !== null))
@@ -96,6 +99,7 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
         // Check if dump is part of the input json set
         if (array_key_exists("dump", $userRequest)) {
+
             $dump = boolval($userRequest["dump"]);
         }   // End if (array_key_exists("dump", $userRequest))
 
@@ -120,6 +124,8 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
                     $errorMessage = "Could not connect to the database.";
                 } else {
                     // All individual parameters need to be checked
+
+                    // log
                     $useLog = mysqli_real_escape_string($con, $log);
 
                     if (strlen($useLog) > 255) {
@@ -134,10 +140,10 @@ if (($_SERVER["REQUEST_METHOD"] === "POST") &&
 
                     // Unable to fetch result, display error message
                     if (!$result) {
- 
                         $errorCode     = 3;
                         $errorMessage  = "Invalid query: " . mysqli_error($con) . "<br/>";
                         $errorMessage .= ("Whole query: " . $query);
+
                     } else if ($row = mysqli_fetch_assoc($result)) {
 
                         if (array_key_exists("logId", $row)) {
