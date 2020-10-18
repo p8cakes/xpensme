@@ -39,6 +39,9 @@ ob_start();
 // Start the initial session
 session_start();
 
+// What is the string that needs to be saved? Foo Bar is an example
+$message = "Foo Bar";
+
 // Break out of test if key not present in incoming request
 if ((!isset($_GET["s"])) || ($_GET["s"] !== "$$TEST_QUERY_KEY$$")) {     // $$ TEST_QUERY_KEY $$
     exit();
@@ -51,18 +54,23 @@ if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier) {
     exit();
 }   //  End if (strtolower($_SERVER["HTTP_HOST"]) !== $global_siteCookieQualifier)
 
+// Value to be saved can be furnished via the query string
+if (isset($_GET["m"])) {
+    $message = $_GET["m"];
+}   //  End if (isset($_GET["m"]))
+
 // STEP 1 - Positive use-case
 // ********* Call Web Service with valid log string, verify you get back a non-zero log ID ********** //
 $ch               = curl_init();
 
 $elements         = array();
-$elements["log"]  = "Foo Bar";
+$elements["log"]  = $message;
 $elements["dump"] = true;
 
 curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/addAppLog.php");
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'ApiKey: $$API_KEY$$',           // $$ API_KEY $$
+    'ApiKey: 22c42fa321e74e9d8c687372195a6664',           // $$ API_KEY $$
     'Content-Type: application/x-www-form-urlencoded',
     'Accept: application/json'));
 
@@ -84,10 +92,15 @@ $errorCode     = intval($checkResponse["errorCode"]);
 
 if ($errorCode === 0) {
     $logId = $checkResponse["logId"];
-    echo("logId is $logId");
+
+    if (isset($_GET["m"])) {
+        echo("{\"logId\":" . $logId . "}");
+    } else {
+        echo("1: Pass. Saved with logId: " . $logId);
+    }   //  End if (isset($_GET["m"]))
 } else {
-    echo($checkResponse);
-}
+    echo("1: Fail. Found response: " . $response);
+}   //  End if ($errorCode === 0)
 
 ob_end_flush();
 ?>
