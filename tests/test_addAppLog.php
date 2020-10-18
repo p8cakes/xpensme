@@ -23,7 +23,7 @@
 //    None
 //
 // Revisions:
-//    1. Sundar Krishnamurthy          sundar@passion8cakes.com       09/25/2020      Initial file created.
+//    1. Sundar Krishnamurthy          sundar@passion8cakes.com       10/17/2020      Initial file created.
 
 ini_set('session.cookie_httponly', TRUE);           // Mitigate XSS
 ini_set('session.session.use_only_cookies', TRUE);  // No session fixation
@@ -70,9 +70,9 @@ $elements["dump"] = true;
 curl_setopt($ch, CURLOPT_URL, $global_siteUrl . "services/addAppLog.php");
 
 curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    'ApiKey: 22c42fa321e74e9d8c687372195a6664',           // $$ API_KEY $$
-    'Content-Type: application/x-www-form-urlencoded',
-    'Accept: application/json'));
+                 "ApiKey: $$API_KEY$$",           // $$ API_KEY $$
+                 "Content-Type: application/x-www-form-urlencoded",
+                 "Accept: application/json"));
 
 curl_setopt($ch, CURLOPT_SSLVERSION, 6);
 curl_setopt($ch, CURLOPT_POST, 1);
